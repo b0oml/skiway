@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skiway Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            padding: 16px;
+        }
+        #pathResult {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .edge {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            border-radius: 8px;
+            background: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Skiway Finder</h1>
+    <div class="mb-3">
+        <label for="startEdge" class="form-label">Départ</label>
+        <select id="startEdge" class="form-select"></select>
+    </div>
+    <div class="mb-3">
+        <label for="endEdge" class="form-label">Arrivée</label>
+        <select id="endEdge" class="form-select"></select>
+    </div>
+    <div class="mb-3">
+        <button id="findPath" class="btn btn-primary">Recherche</button>
+    </div>
+    <h2>Plus court chemin</h2>
+    <div id="pathResult">
+    </div>
+
+    <script>
+        const edges = [{ "type": "aerialway", "name": "TC8 Soldeu" }, { "type": "piste", "name": "Piste near TC8 Soldeu", "difficulty": "unknown" }, { "type": "aerialway", "name": "TC8 Canillo" }, { "type": "piste", "name": "Piste near TC8 Canillo", "difficulty": "unknown" }, { "type": "piste", "name": "Astoret", "difficulty": "easy" }, { "type": "piste", "name": "Gall de Bosc", "difficulty": "easy" }, { "type": "piste", "name": "Paniquera", "difficulty": "easy" }, { "type": "piste", "name": "Piste near TK Bassots", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near unknown", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TK Espiolets", "difficulty": "unknown" }, { "type": "piste", "name": "Os", "difficulty": "easy" }, { "type": "piste", "name": "Bosc Fosc", "difficulty": "easy" }, { "type": "piste", "name": "Piste near TSF4 Planell de la Font", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD6 Solana" }, { "type": "piste", "name": "Piste near TSD6 Solana", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD6 Tosa Espiolets" }, { "type": "piste", "name": "Piste near TSD6 Llosada", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TK Fonts Roges", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSD6 Tosa Espiolets", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD6 Llosada" }, { "type": "aerialway", "name": "TSF4 Assaladors" }, { "type": "piste", "name": "Piste near TSF4 Solanelles", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSF4 Assaladors", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 Solanelles" }, { "type": "aerialway", "name": "TSD6 Soldeu" }, { "type": "piste", "name": "Piste near TSD6 Soldeu", "difficulty": "unknown" }, { "type": "piste", "name": "Avet", "difficulty": "advanced" }, { "type": "piste", "name": "unknown", "difficulty": "easy" }, { "type": "piste", "name": "Eslalom", "difficulty": "advanced" }, { "type": "piste", "name": "Fagina", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TK Bosc" }, { "type": "piste", "name": "Piste near TK Bosc", "difficulty": "unknown" }, { "type": "aerialway", "name": "TK Bassots" }, { "type": "piste", "name": "Colibri", "difficulty": "intermediate" }, { "type": "piste", "name": "Enllac", "difficulty": "easy" }, { "type": "piste", "name": "Enradort", "difficulty": "intermediate" }, { "type": "piste", "name": "Riu Cubil", "difficulty": "easy" }, { "type": "piste", "name": "L'Avi", "difficulty": "easy" }, { "type": "piste", "name": "Mirador", "difficulty": "advanced" }, { "type": "piste", "name": "Grio", "difficulty": "intermediate" }, { "type": "piste", "name": "Perdiu Blanca", "difficulty": "intermediate" }, { "type": "piste", "name": "Cami de Pessons", "difficulty": "intermediate" }, { "type": "piste", "name": "Piste near TSF4 Llac del Cubil", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSF4 Enradort", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TK2 Llac del Cubil", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 Llac del Cubil" }, { "type": "aerialway", "name": "TSD4 Cubil" }, { "type": "piste", "name": "Piste near TSD Coma Blanca", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSD6 Pic Blanc", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSF4 Xavi", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSD4 Cubil", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD Coma Blanca" }, { "type": "piste", "name": "Piste near TK Coma Blanca III", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD6 Pic Blanc" }, { "type": "piste", "name": "Serrat Pinos", "difficulty": "intermediate" }, { "type": "piste", "name": "Tortuga", "difficulty": "easy" }, { "type": "piste", "name": "Pala Nova", "difficulty": "intermediate" }, { "type": "piste", "name": "Riberal", "difficulty": "advanced" }, { "type": "piste", "name": "Tamarro", "difficulty": "advanced" }, { "type": "piste", "name": "Llac", "difficulty": "intermediate" }, { "type": "piste", "name": "Directa I", "difficulty": "intermediate" }, { "type": "piste", "name": "Pista Llarga", "difficulty": "intermediate" }, { "type": "piste", "name": "Gencana", "difficulty": "intermediate" }, { "type": "piste", "name": "Menera", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TSD6 Pla de les Pedres Soldeu" }, { "type": "piste", "name": "Piste near TSD6 Pla de les Pedres Soldeu", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD6 Pla de les Pedres Grau Roig" }, { "type": "piste", "name": "Piste near TSD6 Pla de les Pedres Grau Roig", "difficulty": "unknown" }, { "type": "aerialway", "name": "TK Escola" }, { "type": "piste", "name": "Piste near TK Escola", "difficulty": "unknown" }, { "type": "piste", "name": "Guineu", "difficulty": "easy" }, { "type": "piste", "name": "Miquel", "difficulty": "intermediate" }, { "type": "piste", "name": "Oreneta", "difficulty": "easy" }, { "type": "piste", "name": "Teixo", "difficulty": "easy" }, { "type": "piste", "name": "Piste near TK Llosada", "difficulty": "unknown" }, { "type": "piste", "name": "Llop", "difficulty": "intermediate" }, { "type": "piste", "name": "Riu Solanelles", "difficulty": "intermediate" }, { "type": "piste", "name": "Solanella", "difficulty": "easy" }, { "type": "piste", "name": "Xicoia", "difficulty": "easy" }, { "type": "piste", "name": "Solanelles", "difficulty": "easy" }, { "type": "piste", "name": "Fura", "difficulty": "easy" }, { "type": "piste", "name": "Cucut", "difficulty": "intermediate" }, { "type": "piste", "name": "Obagot I", "difficulty": "intermediate" }, { "type": "piste", "name": "Trencalos", "difficulty": "advanced" }, { "type": "piste", "name": "Marmota", "difficulty": "easy" }, { "type": "piste", "name": "Obac Solana", "difficulty": "easy" }, { "type": "piste", "name": "Acces Miquel", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TC10 Tarter" }, { "type": "piste", "name": "Piste near TC10 Tarter", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD4 Tarter" }, { "type": "piste", "name": "Piste near TSD4 Tarter", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 Enradort" }, { "type": "piste", "name": "Pla de les Pedres - Andorre", "difficulty": "intermediate" }, { "type": "piste", "name": "Serra de les Solanelles", "difficulty": "intermediate" }, { "type": "piste", "name": "Obaga", "difficulty": "easy" }, { "type": "piste", "name": "Cortalets", "difficulty": "easy" }, { "type": "piste", "name": "Solana", "difficulty": "easy" }, { "type": "piste", "name": "Gaig", "difficulty": "advanced" }, { "type": "piste", "name": "Rossinyol", "difficulty": "easy" }, { "type": "piste", "name": "Forn", "difficulty": "novice" }, { "type": "piste", "name": "Daina", "difficulty": "easy" }, { "type": "piste", "name": "Geneta", "difficulty": "easy" }, { "type": "piste", "name": "Piste near TSD4 Portella", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSF4 J\u00fanior", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD4 Portella" }, { "type": "piste", "name": "Tamarro (El Tarter)", "difficulty": "intermediate" }, { "type": "piste", "name": "Variant Tamarro", "difficulty": "easy" }, { "type": "aerialway", "name": "TSF4 J\u00fanior" }, { "type": "aerialway", "name": "TK Llosada" }, { "type": "aerialway", "name": "TSF4 els Clots" }, { "type": "piste", "name": "Piste near TSF4 els Clots", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 Colibr\u00ed" }, { "type": "piste", "name": "Piste near TSF4 Colibr\u00ed", "difficulty": "unknown" }, { "type": "piste", "name": "Esquirol", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TK Espiolets" }, { "type": "piste", "name": "Duc", "difficulty": "easy" }, { "type": "piste", "name": "Llebre", "difficulty": "intermediate" }, { "type": "piste", "name": "Corb", "difficulty": "intermediate" }, { "type": "piste", "name": "\u00c0liga", "difficulty": "advanced" }, { "type": "piste", "name": "Esparver", "difficulty": "intermediate" }, { "type": "piste", "name": "Muflo", "difficulty": "advanced" }, { "type": "piste", "name": "Falco", "difficulty": "advanced" }, { "type": "piste", "name": "Cabirol", "difficulty": "advanced" }, { "type": "piste", "name": "Voltor", "difficulty": "advanced" }, { "type": "piste", "name": "Torrallardona", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TK Fonts Roges" }, { "type": "piste", "name": "Mussol", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TSF4 Pi de Migdia" }, { "type": "piste", "name": "Piste near TSF4 Pi de Migdia", "difficulty": "unknown" }, { "type": "piste", "name": "Pardal", "difficulty": "easy" }, { "type": "piste", "name": "Pi di Migdia", "difficulty": "easy" }, { "type": "piste", "name": "Salvans", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TC Funicamp" }, { "type": "piste", "name": "Piste near TC Funicamp", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 La Solana" }, { "type": "piste", "name": "Piste near TSD4 Pas de la Casa", "difficulty": "unknown" }, { "type": "piste", "name": "Piste near TSF4 La Solana", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSD4 Pas de la Casa" }, { "type": "aerialway", "name": "TSD6 Font Negre" }, { "type": "piste", "name": "Piste near TSD6 Font Negre", "difficulty": "unknown" }, { "type": "aerialway", "name": "TK Coma Blanca III" }, { "type": "aerialway", "name": "TSD4 Les Antenes" }, { "type": "piste", "name": "Piste near TSD4 Les Antenes", "difficulty": "unknown" }, { "type": "aerialway", "name": "TK Clot" }, { "type": "piste", "name": "Piste near TK Clot", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF4 Xavi" }, { "type": "aerialway", "name": "TSF4 Costa Rodona" }, { "type": "piste", "name": "Piste near TSF4 Costa Rodona", "difficulty": "unknown" }, { "type": "aerialway", "name": "TSF2 Coll dels Isards" }, { "type": "piste", "name": "Piste near TSF2 Coll dels Isards", "difficulty": "unknown" }, { "type": "piste", "name": "Aigues Tortes", "difficulty": "intermediate" }, { "type": "piste", "name": "Cadernera", "difficulty": "easy" }, { "type": "piste", "name": "Perdiu", "difficulty": "easy" }, { "type": "piste", "name": "Piste near TK Encampadana", "difficulty": "unknown" }, { "type": "piste", "name": "V Enradort", "difficulty": "easy" }, { "type": "piste", "name": "Isard", "difficulty": "intermediate" }, { "type": "piste", "name": "Picot", "difficulty": "easy" }, { "type": "aerialway", "name": "TK Encampadana" }, { "type": "aerialway", "name": "TK2 Llac del Cubil" }, { "type": "piste", "name": "Cortals", "difficulty": "easy" }, { "type": "piste", "name": "Antenes", "difficulty": "advanced" }, { "type": "piste", "name": "Grandalles", "difficulty": "intermediate" }, { "type": "piste", "name": "Bosc", "difficulty": "easy" }, { "type": "piste", "name": "Clot", "difficulty": "easy" }, { "type": "piste", "name": "Bosquet", "difficulty": "easy" }, { "type": "piste", "name": "Gavatxa", "difficulty": "intermediate" }, { "type": "piste", "name": "Pastora", "difficulty": "easy" }, { "type": "piste", "name": "Portella", "difficulty": "easy" }, { "type": "piste", "name": "Corbater", "difficulty": "advanced" }, { "type": "piste", "name": "Directa II", "difficulty": "intermediate" }, { "type": "piste", "name": "Tubs", "difficulty": "easy" }, { "type": "piste", "name": "Fis", "difficulty": "advanced" }, { "type": "piste", "name": "Fletxa", "difficulty": "easy" }, { "type": "piste", "name": "Pioners", "difficulty": "easy" }, { "type": "piste", "name": "Isards", "difficulty": "easy" }, { "type": "piste", "name": "Granota", "difficulty": "advanced" }, { "type": "piste", "name": "Montmal\u00fas", "difficulty": "intermediate" }, { "type": "aerialway", "name": "TSF4 Planell de la Font" }, { "type": "piste", "name": "Pista Escola", "difficulty": "novice" }, { "type": "piste", "name": "Les Deveses", "difficulty": "easy" }];
+        edges.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Function to populate selectors
+        function populateSelectors() {
+            const startEdgeSelect = document.getElementById('startEdge');
+            const endEdgeSelect = document.getElementById('endEdge');
+
+            edges.forEach(edge => {
+                const option1 = document.createElement('option');
+                const option2 = document.createElement('option');
+                option1.value = option2.value = edge.name;
+                option1.text = option2.text = edge.name;
+                startEdgeSelect.appendChild(option1);
+                endEdgeSelect.appendChild(option2);
+            });
+        }
+
+        // Function to find and display the shortest path
+        async function findAndDisplayPath() {
+            const startEdge = document.getElementById('startEdge').value;
+            const endEdge = document.getElementById('endEdge').value;
+            const response = await fetch(`/path?start_edge=${startEdge}&end_edge=${endEdge}`);
+            if (!response.ok) {
+                document.getElementById('pathResult').innerText = 'Error fetching path.';
+                return;
+            }
+            const path = await response.json();
+            const pathResult = document.getElementById('pathResult');
+            pathResult.innerHTML = '';
+            path.forEach(edge => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                const header = document.createElement('div');
+                header.classList.add('card-header');
+                header.innerText = edge.type === 'aerialway' ? 'Remontée mécanique' : 'Piste';
+                card.appendChild(header);
+                const body = document.createElement('div');
+                body.classList.add('card-body');
+                card.appendChild(body);
+                const nameSpan = document.createElement('span');
+                nameSpan.classList.add('name');
+                nameSpan.innerText = edge.name;
+                body.appendChild(nameSpan);
+                if (edge.difficulty) {
+                    switch (edge.difficulty) {
+                        case 'easy':
+                            card.classList.add('text-bg-success');
+                            break;
+                        case 'intermediate':
+                            card.classList.add('text-bg-info');
+                            break;
+                        case 'advanced':
+                            card.classList.add('text-bg-danger');
+                            break;
+                        case 'expert':
+                            card.classList.add('text-bg-dark');
+                            break;
+                    }
+                    body.classList.add(edge.difficulty);
+                }
+                pathResult.appendChild(card);
+            });
+        }
+
+        document.getElementById('findPath').addEventListener('click', findAndDisplayPath);
+
+        // Populate selectors on page load
+        window.onload = populateSelectors;
+    </script>
+</body>
+</html>
